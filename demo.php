@@ -8,7 +8,7 @@
 header('Content-type: text/html; charset=utf-8');
 date_default_timezone_set('PRC');
 
-require_once 'class/LSensitiveWordFilter.php';
+require_once 'Lib/SensitiveWordFilter.php';
 
 $sTime = microtime(true);
 

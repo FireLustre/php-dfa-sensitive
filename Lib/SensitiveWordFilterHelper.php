@@ -6,16 +6,22 @@
  * Date: 17/3/9
  * Time: 上午9:11
  */
-require_once 'LHashMap.php';
+namespace Lib;
 
-class LSensitiveWordFilter
+use Lib\HashMap;
+
+class SensitiveWordFilterHelper
 {
 
     private static $_instance;
 
     public static $badWordList = array();
 
-    //获取单例
+    /**
+     * 获取单例
+     *
+     * @return LSensitiveWordFilter
+     */
     public static function init()
     {
         if (!self::$_instance instanceof self) {
@@ -26,18 +32,19 @@ class LSensitiveWordFilter
 
     /**
      * 将敏感词加入到HashMap中
+     *
      * @param $sensitiveWord
-     * @return obj
-     **/
+     * @return HashMap
+     */
     public function setHashMap($sensitiveWord)
     {
-        $wordMap = new LHashMap();
+        $wordMap = new HashMap();
         foreach ($sensitiveWord as $word) {
             $nowMap = $wordMap;
             $wordLength = mb_strlen($word, 'utf-8');
             for ($i = 0; $i < $wordLength; $i++) {
                 $keyChar = mb_substr($word, $i, 1, 'utf-8');
-                //获取
+                // 获取
                 $tempMap = $nowMap->get($keyChar);
                 if ($tempMap) {
                     $nowMap = $tempMap;
@@ -60,9 +67,12 @@ class LSensitiveWordFilter
 
     /**
      * 获取文字中的敏感词
+     *
+     * @param $wordMap
      * @param $content
-     * @return obj
-     **/
+     * @param int $matchType
+     * @return array
+     */
     public function getSensitiveWord($wordMap, $content, $matchType = 1)
     {
         $contentLength = mb_strlen($content, 'utf-8');
@@ -73,39 +83,38 @@ class LSensitiveWordFilter
             $tempMap = $wordMap;
             for ($i = $len; $i < $contentLength; $i++) {
                 $keyChar = mb_substr($content, $i, 1, 'utf-8');
-                //获取指定key
+                // 获取指定key
                 $nowMap = $tempMap->get($keyChar);
-                //存在，则判断是否为最后一个
+                // 存在，则判断是否为最后一个
                 if ($nowMap != null) {
                     $tempMap = $nowMap;
-                    //找到相应key，偏移量+1
+                    // 找到相应key，偏移量+1
                     $matchFlag++;
-                    //如果为最后一个匹配规则,结束循环，返回匹配标识数
+                    // 如果为最后一个匹配规则,结束循环，返回匹配标识数
                     if ($nowMap->get("isEnd") == '1') {
                         $flag = true;
                         if ($matchType == 1) {
-                            //最小规则，直接返回
+                            // 最小规则，直接返回
                             break;
                         } else {
-                            //最大规则还需继续查找
+                            // 最大规则还需继续查找
                             continue;
                         }
                     } else {
                         continue;
                     }
                 } else {
-                    //不存在，直接返回
+                    // 不存在，直接返回
                     break;
                 }
             }
             if (!$flag) {
                 $matchFlag = 0;
             }
-
-            //未找到相应key
+            // 未找到相应key
             if ($matchFlag > 0) {
                 $badWordList[] = mb_substr($content, $len, $matchFlag, 'utf-8');
-                //需匹配内容标志位往后移
+                // 需匹配内容标志位往后移
                 $len = $len + $matchFlag - 1;
             } else {
                 continue;
@@ -115,7 +124,17 @@ class LSensitiveWordFilter
     }
 
 
-    //替换敏感字字符
+    /**
+     * 替换敏感字字符
+     *
+     * @param $wordMap
+     * @param $content
+     * @param $replaceChar
+     * @param string $sTag
+     * @param string $eTag
+     * @param int $matchType
+     * @return mixed
+     */
     public function replaceSensitiveWord($wordMap, $content, $replaceChar, $sTag = '', $eTag = '', $matchType = 1)
     {
         if (empty(self::$badWordList)) {
