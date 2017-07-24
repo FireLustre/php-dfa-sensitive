@@ -6,16 +6,14 @@
  * Date: 17/3/9
  * Time: 上午9:11
  */
-namespace Lib;
+namespace DfaFilter;
 
-use Lib\HashMap;
-
-class SensitiveWordFilterHelper
+class SensitiveHelper
 {
 
     private static $_instance;
 
-    public static $badWordList = array();
+    protected static $badWordList = array();
 
     /**
      * 获取单例
@@ -83,42 +81,37 @@ class SensitiveWordFilterHelper
             $tempMap = $wordMap;
             for ($i = $len; $i < $contentLength; $i++) {
                 $keyChar = mb_substr($content, $i, 1, 'utf-8');
+
                 // 获取指定key
                 $nowMap = $tempMap->get($keyChar);
+
+                // 不存在，直接返回
+                if (empty($nowMap)) break;
+
                 // 存在，则判断是否为最后一个
-                if ($nowMap != null) {
-                    $tempMap = $nowMap;
-                    // 找到相应key，偏移量+1
-                    $matchFlag++;
-                    // 如果为最后一个匹配规则,结束循环，返回匹配标识数
-                    if ($nowMap->get("isEnd") == '1') {
-                        $flag = true;
-                        if ($matchType == 1) {
-                            // 最小规则，直接返回
-                            break;
-                        } else {
-                            // 最大规则还需继续查找
-                            continue;
-                        }
-                    } else {
-                        continue;
-                    }
-                } else {
-                    // 不存在，直接返回
+                $tempMap = $nowMap;
+
+                // 找到相应key，偏移量+1
+                $matchFlag++;
+
+                // 如果为最后一个匹配规则,结束循环，返回匹配标识数
+                if ('1' !== $nowMap->get('isEnd')) continue;
+                $flag = true;
+
+                // 最小规则，直接返回
+                if ($matchType == 1)
                     break;
-                }
+                 else // 最大规则还需继续查找
+                    continue;
             }
-            if (!$flag) {
-                $matchFlag = 0;
-            }
-            // 未找到相应key
-            if ($matchFlag > 0) {
-                $badWordList[] = mb_substr($content, $len, $matchFlag, 'utf-8');
-                // 需匹配内容标志位往后移
-                $len = $len + $matchFlag - 1;
-            } else {
-                continue;
-            }
+            if (! $flag) $matchFlag = 0;
+
+            // 找到相应key
+            if ($matchFlag <= 0) continue;
+            $badWordList[] = mb_substr($content, $len, $matchFlag, 'utf-8');
+
+            // 需匹配内容标志位往后移
+            $len = $len + $matchFlag - 1;
         }
         return $badWordList;
     }
@@ -143,13 +136,15 @@ class SensitiveWordFilterHelper
             $badWordList = self::$badWordList;
         }
 
-        if (!empty($badWordList)) {
-            foreach ($badWordList as $badWord) {
-                if ($sTag || $eTag) {
-                    $replaceChar = $sTag . $badWord . $eTag;
-                }
-                $content = str_replace($badWord, $replaceChar, $content);
+        // 未检测到敏感词，直接返回
+        if (empty($badWordList))
+            return $content;
+
+        foreach ($badWordList as $badWord) {
+            if ($sTag || $eTag) {
+                $replaceChar = $sTag . $badWord . $eTag;
             }
+            $content = str_replace($badWord, $replaceChar, $content);
         }
         return $content;
     }

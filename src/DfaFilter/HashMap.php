@@ -7,7 +7,7 @@
  * Time: 上午9:10
  **/
 
-namespace Lib;
+namespace DfaFilter;
 
 class HashMap
 {

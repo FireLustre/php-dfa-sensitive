@@ -8,18 +8,20 @@
 
 $sTime = microtime(true);
 
-require_once 'autoload.php';
+require './vendor/autoload.php';
 
+use DfaFilter;
 // 获取铭感词库
 $wordPool = file_get_contents('keyWord.txt');
 $wordData = explode(',', $wordPool);
 
-$sensitiveWordHelper = Lib\SensitiveWordFilterHelper::init();
+$sensitiveWordHelper = DfaFilter\SensitiveHelper::init();
+
 // 构建敏感词hashMap
 $sensitiveWordMap = $sensitiveWordHelper->setHashMap($wordData);
 
 // 过滤
-$content = $_POST['content'];
+$content = '这是一段测试语句，请忽略赌球网';
 $filterContent = $sensitiveWordHelper->replaceSensitiveWord($sensitiveWordMap, $content, '***');
 
 $eTime = microtime(true);
