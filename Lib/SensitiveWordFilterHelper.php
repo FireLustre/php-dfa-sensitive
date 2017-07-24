@@ -50,7 +50,7 @@ class SensitiveWordFilterHelper
                     $nowMap = $tempMap;
                 } else {
                     // 设置标志位
-                    $newMap = new LHashMap();
+                    $newMap = new HashMap();
                     $newMap->put('isEnd', '0');
                     // 添加到集合
                     $nowMap->put($keyChar, $newMap);
