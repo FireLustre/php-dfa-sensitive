@@ -1,7 +1,7 @@
 # php-DFA-filterWord
 php实现基于确定有穷自动机算法的铭感词过滤
 
-### 使用流程
+###  安装&使用流程
 > composer安装 
 
     composer require lustre/php-dfa-sensitive
