@@ -2,6 +2,18 @@
 php实现基于确定有穷自动机算法的铭感词过滤
 
 ### 使用流程
+> composer安装 
+
+    composer require lustre/php-dfa-sensitive
+   
+> 实例化敏感词过滤助手
+
+    require './vendor/autoload.php';
+    
+    use DfaFilter\SensitiveHelper;
+    
+    $sensitiveWordHelper = SensitiveHelper::init();
+
 > 获取敏感词库
 
     //获取感词库索引数组
@@ -14,10 +26,6 @@ php实现基于确定有穷自动机算法的铭感词过滤
         ......
     );
     
-> 实例化敏感词过滤助手
-
-    $sensitiveWordHelper = SensitiveHelper::init();
-
 > 构建敏感词hashMap
 
     //构建敏感词hashMap
