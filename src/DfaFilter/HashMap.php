@@ -14,14 +14,11 @@ class HashMap
     /**
      * 哈希表变量
      *
-     * @var array
+     * @var array|null
      */
-    protected $hashTable;
+    protected $hashTable = array();
 
-    public function __construct()
-    {
-        $this->hashTable = array();
-    }
+    public function __construct(){}
 
     /**
      * 向HashMap中添加一个键值对
@@ -35,11 +32,10 @@ class HashMap
         if (! array_key_exists($key, $this->hashTable)) {
             $this->hashTable[$key] = $value;
             return null;
-        } else {
-            $_temp = $this->hashTable[$key];
-            $this->hashTable[$key] = $value;
-            return $_temp;
         }
+        $_temp = $this->hashTable[$key];
+        $this->hashTable[$key] = $value;
+        return $_temp;
     }
 
     /**
@@ -50,9 +46,9 @@ class HashMap
      */
     public function get($key)
     {
-        if (array_key_exists($key, $this->hashTable))
+        if (array_key_exists($key, $this->hashTable)) {
             return $this->hashTable[$key];
-
+        }
         return null;
     }
 
@@ -68,15 +64,15 @@ class HashMap
         if (array_key_exists($key, $this->hashTable)) {
             $tempValue = $this->hashTable[$key];
             while ($curValue = current($this->hashTable)) {
-                if (! (key($this->hashTable) == $key))
+                if (! (key($this->hashTable) == $key)) {
                     $temp_table[key($this->hashTable)] = $curValue;
+                }
                 next($this->hashTable);
             }
             $this->hashTable = null;
             $this->hashTable = $temp_table;
             return $tempValue;
         }
-
         return null;
     }
 
@@ -142,7 +138,6 @@ class HashMap
             }
             next($this->hashTable);
         }
-
         return false;
     }
 
@@ -180,6 +175,4 @@ class HashMap
     {
         return (count($this->hashTable) == 0);
     }
-
-
 }
