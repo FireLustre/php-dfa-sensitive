@@ -6,13 +6,11 @@ php实现基于确定有穷自动机算法的铭感词过滤
 
     composer require lustre/php-dfa-sensitive
    
-> 实例化敏感词过滤助手
+> 如果你需要手动引入
 
     require './vendor/autoload.php';
     
     use DfaFilter\SensitiveHelper;
-    
-    $sensitiveWordHelper = SensitiveHelper::init();
 
 > 获取敏感词库
 
