@@ -38,5 +38,8 @@ php实现基于确定有穷自动机算法的铭感词过滤
     $sensitiveWordGroup = SensitiveHelper::init()->setTree($wordData)->getBadWord($content);
     // 仅且获取一个敏感词
     $sensitiveWordGroup = SensitiveHelper::init()->setTree($wordData)->getBadWord($content, 1);
-    
+
+目前已知使用平台：[广电云](http://www.guangdianyun.tv/) 节目直播页面在线聊天功能支持
+
+
 *如果大家有更好的建议，请大家多多指正，O(∩_∩)O谢谢*
