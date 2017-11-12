@@ -1,7 +1,7 @@
 {
     "name": "lustre/php-dfa-sensitive",
     "description": "To achieve the filtering of sensitive words, based on the determination of finite automata (DFA) algorithm.",
-    "type": "composer-plugin",
+    "type": "library",
     "license": "MIT",
     "authors": [
         {
