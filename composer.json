@@ -9,7 +9,6 @@
             "email": "firelustre@163.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "php": ">=5.3"
     },
