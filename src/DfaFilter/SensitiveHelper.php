@@ -41,7 +41,7 @@ class SensitiveHelper
     /**
      * 获取单例
      *
-     * @return LSensitiveWordFilter
+     * @return self
      */
     public static function init()
     {
