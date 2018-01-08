@@ -51,6 +51,25 @@ php实现基于确定有穷自动机算法的铭感词过滤
     // 仅且获取一个敏感词
     $sensitiveWordGroup = SensitiveHelper::init()->setTree($wordData)->getBadWord($content, 1);
 
+### 如何使用单元测试进行测试
+#### 安装PHPUnit
+```bash
+$ wget https://phar.phpunit.de/phpunit.phar
+
+$ chmod +x phpunit.phar
+
+$ mv phpunit.phar /usr/local/bin/phpunit
+```
+#### 使用composer自动加载php命名空间
+
+```bash
+$ composer update
+```
+### 运行单元测试
+```bash
+$ phpunit tests/BaseTest.php
+```
+
 目前已知使用平台：[广电云](http://www.guangdianyun.tv/) 节目直播页面在线聊天功能支持
 
 
