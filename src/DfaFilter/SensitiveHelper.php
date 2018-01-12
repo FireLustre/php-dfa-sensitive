@@ -51,46 +51,45 @@ class SensitiveHelper
         return self::$_instance;
     }
 
-
     /**
-     * 构建铭感词树
+     * 构建铭感词树【文件模式】
      *
      * @param string $sensitiveWord
      * @return $this
      */
-    public function setTree($sensitiveWords = '')
+    public function setTreeByFile($filepath = '')
+    {
+        if (! file_exists($filepath)) {
+            throw new \Exception('词库文件不存在');
+        }
+
+        // 词库树初始化
+        $this->wordTree = new HashMap();
+
+        foreach ($this->yieldToReadFile($filepath) as $word) {
+            $this->buildWordToTree(trim($word));
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * 构建铭感词树【数组模式】
+     *
+     * @param string $sensitiveWord
+     * @return $this
+     */
+    public function setTree($sensitiveWords = null)
     {
         if (empty($sensitiveWords)) {
             throw new \Exception('词库不能为空');
         }
+
         $this->wordTree = new HashMap();
+
         foreach ($sensitiveWords as $word) {
-            $tree = $this->wordTree;
-            $wordLength = mb_strlen($word, 'utf-8');
-            for ($i = 0; $i < $wordLength; $i++) {
-                $keyChar = mb_substr($word, $i, 1, 'utf-8');
-
-                // 获取子节点树结构
-                $tempTree = $tree->get($keyChar);
-
-                if ($tempTree) {
-                    $tree = $tempTree;
-                } else {
-                    // 设置标志位
-                    $newTree = new HashMap();
-                    $newTree->put('ending', false);
-
-                    // 添加到集合
-                    $tree->put($keyChar, $newTree);
-                    $tree = $newTree;
-                }
-
-                // 到达最后一个节点
-                if ($i == $wordLength - 1) {
-                    $tree->put('ending', true);
-                }
-
-            }
+            $this->buildWordToTree($word);
         }
         return $this;
     }
@@ -117,21 +116,27 @@ class SensitiveHelper
                 $nowMap = $tempMap->get($keyChar);
 
                 // 不存在节点树，直接返回
-                if (empty($nowMap)) break;
+                if (empty($nowMap)) {
+                    break;
+                }
 
                 // 存在，则判断是否为最后一个
                 $tempMap = $nowMap;
 
                 // 找到相应key，偏移量+1
-                $matchFlag ++;
+                $matchFlag++;
 
                 // 如果为最后一个匹配规则,结束循环，返回匹配标识数
-                if (false === $nowMap->get('ending')) continue;
+                if (false === $nowMap->get('ending')) {
+                    continue;
+                }
 
                 $flag = true;
 
                 // 最小规则，直接退出
-                if (1 === $matchType)  break;
+                if (1 === $matchType)  {
+                    break;
+                }
             }
 
             if (! $flag) {
@@ -204,16 +209,18 @@ class SensitiveHelper
                 $nowMap = $tempMap->get($keyChar);
 
                 // 不存在节点树，直接返回
-                if (empty($nowMap)) break;
-
-                // 存在，则判断是否为最后一个
-                $tempMap = $nowMap;
+                if (empty($nowMap)) {
+                    break;
+                }
 
                 // 找到相应key，偏移量+1
-                $matchFlag ++;
+                $tempMap = $nowMap;
+                $matchFlag++;
 
                 // 如果为最后一个匹配规则,结束循环，返回匹配标识数
-                if (false === $nowMap->get('ending')) continue;
+                if (false === $nowMap->get('ending')) {
+                    continue;
+                }
 
                 return true;
             }
@@ -227,5 +234,50 @@ class SensitiveHelper
             $length = $length + $matchFlag - 1;
         }
         return false;
+    }
+
+    protected function yieldToReadFile($filepath)
+    {
+        $fp = fopen($filepath, 'r');
+        while (! feof($fp)) {
+            yield fgets($fp);
+        }
+        fclose($fp);
+    }
+
+    // 将单个敏感词构建成树结构
+    protected function buildWordToTree($word = '')
+    {
+        if ('' === $word) {
+            return;
+        }
+        $tree = $this->wordTree;
+
+        $wordLength = mb_strlen($word, 'utf-8');
+        for ($i = 0; $i < $wordLength; $i++) {
+            $keyChar = mb_substr($word, $i, 1, 'utf-8');
+
+            // 获取子节点树结构
+            $tempTree = $tree->get($keyChar);
+
+            if ($tempTree) {
+                $tree = $tempTree;
+            } else {
+                // 设置标志位
+                $newTree = new HashMap();
+                $newTree->put('ending', false);
+
+                // 添加到集合
+                $tree->put($keyChar, $newTree);
+                $tree = $newTree;
+            }
+
+            // 到达最后一个节点
+            if ($i == $wordLength - 1) {
+                $tree->put('ending', true);
+            }
+        }
+
+        return;
     }
 }
