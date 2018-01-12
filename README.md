@@ -44,6 +44,7 @@ php实现基于确定有穷自动机算法的铭感词过滤
 
     // 获取感词库文件路径
     $wordFilePath = 'tests/data/words.txt';
+    
     // get one helper
     $handle = SensitiveHelper::init()->setTreeByFile($wordFilePath);
    
