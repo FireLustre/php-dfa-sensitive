@@ -101,7 +101,7 @@ class SensitiveHelper
      * @param int      $matchType  匹配类型【1获取首个敏感词】
      * @return array
      */
-    public function getBadWord($content, $matchType = 1)
+    public function getBadWord($content, $matchType = 0)
     {
         $this->contentLength = mb_strlen($content, 'utf-8');
         $badWordList = array();
@@ -149,6 +149,11 @@ class SensitiveHelper
             }
             $badWordList[] = mb_substr($content, $length, $matchFlag, 'utf-8');
 
+            // 最小规则，直接退出
+            if (1 === $matchType)  {
+                break;
+            }
+            
             // 需匹配内容标志位往后移
             $length = $length + $matchFlag - 1;
         }
