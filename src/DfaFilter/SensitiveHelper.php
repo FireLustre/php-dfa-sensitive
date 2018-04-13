@@ -98,10 +98,11 @@ class SensitiveHelper
      * 检测文字中的敏感词
      *
      * @param string   $content    待检测内容
-     * @param int      $matchType  匹配类型【1获取首个敏感词】
+     * @param int      $matchType  匹配类型 [默认为最小匹配规则]
+     * @param int      $wordNum    需要获取的敏感词数量 [默认获取全部]
      * @return array
      */
-    public function getBadWord($content, $matchType = 1)
+    public function getBadWord($content, $matchType = 1, $wordNum = 0)
     {
         $this->contentLength = mb_strlen($content, 'utf-8');
         $badWordList = array();
@@ -147,7 +148,13 @@ class SensitiveHelper
             if ($matchFlag <= 0) {
                 continue;
             }
+
             $badWordList[] = mb_substr($content, $length, $matchFlag, 'utf-8');
+
+            // 有返回数量限制
+            if ($wordNum > 0 && count($badWordList) == $wordNum) {
+                return $badWordList;
+            }
 
             // 需匹配内容标志位往后移
             $length = $length + $matchFlag - 1;
