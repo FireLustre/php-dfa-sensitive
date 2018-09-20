@@ -1,12 +1,13 @@
 <?php
-
 /**
  * 敏感词类库.
- * User: wanghui
+ * User: Lustre
  * Date: 17/3/9
  * Time: 上午9:11
  */
 namespace DfaFilter;
+
+use DfaFilter\Exceptions\PdsBusinessException;
 
 class SensitiveHelper
 {
@@ -51,16 +52,19 @@ class SensitiveHelper
         return self::$_instance;
     }
 
+
     /**
      * 构建铭感词树【文件模式】
      *
-     * @param string $sensitiveWord
+     * @param string $filepath
+     *
      * @return $this
+     * @throws \DfaFilter\Exceptions\PdsBusinessException
      */
     public function setTreeByFile($filepath = '')
     {
-        if (! file_exists($filepath)) {
-            throw new \Exception('词库文件不存在');
+        if (!file_exists($filepath)) {
+            throw new PdsBusinessException('词库文件不存在', PdsBusinessException::CANNOT_FIND_FILE);
         }
 
         // 词库树初始化
@@ -77,13 +81,15 @@ class SensitiveHelper
     /**
      * 构建铭感词树【数组模式】
      *
-     * @param string $sensitiveWord
+     * @param null $sensitiveWords
+     *
      * @return $this
+     * @throws \DfaFilter\Exceptions\PdsBusinessException
      */
     public function setTree($sensitiveWords = null)
     {
         if (empty($sensitiveWords)) {
-            throw new \Exception('词库不能为空');
+            throw new PdsBusinessException('词库不能为空', PdsBusinessException::EMPTY_WORD_POOL);
         }
 
         $this->wordTree = new HashMap();
@@ -101,6 +107,7 @@ class SensitiveHelper
      * @param int      $matchType  匹配类型 [默认为最小匹配规则]
      * @param int      $wordNum    需要获取的敏感词数量 [默认获取全部]
      * @return array
+     * @throws \DfaFilter\Exceptions\PdsSystemException
      */
     public function getBadWord($content, $matchType = 1, $wordNum = 0)
     {
@@ -162,29 +169,26 @@ class SensitiveHelper
         return $badWordList;
     }
 
-
     /**
      * 替换敏感字字符
      *
-     * @param $wordMap
-     * @param $content
-     * @param $replaceChar
+     * @param        $content
+     * @param string $replaceChar
      * @param string $sTag
      * @param string $eTag
-     * @param int $matchType
+     * @param int    $matchType
+     *
      * @return mixed
+     * @throws \DfaFilter\Exceptions\PdsBusinessException
+     * @throws \DfaFilter\Exceptions\PdsSystemException
      */
     public function replace($content, $replaceChar = '', $sTag = '', $eTag = '', $matchType = 1)
     {
         if (empty($content)) {
-            throw new \Exception('请填写检测的内容');
+            throw new PdsBusinessException('请填写检测的内容', PdsBusinessException::EMPTY_CONTENT);
         }
 
-        if (empty(self::$badWordList)) {
-            $badWordList = $this->getBadWord($content, $matchType);
-        } else {
-            $badWordList = self::$badWordList;
-        }
+        $badWordList = self::$badWordList ? self::$badWordList : $this->getBadWord($content, $matchType);
 
         // 未检测到敏感词，直接返回
         if (empty($badWordList)) {
@@ -200,7 +204,14 @@ class SensitiveHelper
         return $content;
     }
 
-    // 被检测内容是否合法
+    /**
+     * 被检测内容是否合法
+     *
+     * @param $content
+     *
+     * @return bool
+     * @throws \DfaFilter\Exceptions\PdsSystemException
+     */
     public function islegal($content)
     {
         $this->contentLength = mb_strlen($content, 'utf-8');

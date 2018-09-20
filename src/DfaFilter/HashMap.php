@@ -1,8 +1,7 @@
 <?php
-
 /**
  * php构建哈希表类.
- * User: wanghui
+ * User: Lustre
  * Date: 17/3/9
  * Time: 上午9:10
  **/
@@ -99,7 +98,7 @@ class HashMap
     /**
      * 将一个HashMap的值全部put到当前HashMap中
      *
-     * @param $map
+     * @param \DfaFilter\HashMap $map
      */
     public function putAll($map)
     {
@@ -132,7 +131,7 @@ class HashMap
      */
     public function containsValue($value)
     {
-        while ($curValue = current($this->H_table)) {
+        while ($curValue = current($this->hashTable)) {
             if ($curValue == $value) {
                 return true;
             }
