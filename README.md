@@ -60,8 +60,6 @@ php实现基于确定有穷自动机算法的铭感词过滤 https://packagist.o
      $filterContent = $handle->replace($content, '***');
      
  ### 标记敏感词
-     
-     // 敏感词替换为*为例（会替换为相同字符长度的*）
      $markedContent = $handle->mark($content, '<mark>', '</mark>');
     
 ### 获取文字中的敏感词
