@@ -53,8 +53,16 @@ php实现基于确定有穷自动机算法的铭感词过滤 https://packagist.o
     $islegal = $handle->islegal($content);
 ### 敏感词过滤
     
-    // 敏感词替换为***为例
-    $filterContent = $handle->replace($content, '***');
+    // 敏感词替换为*为例（会替换为相同字符长度的*）
+    $filterContent = $handle->replace($content, '*', true);
+    
+     // 或敏感词替换为***为例
+     $filterContent = $handle->replace($content, '***');
+     
+ ### 标记敏感词
+     
+     // 敏感词替换为*为例（会替换为相同字符长度的*）
+     $markedContent = $handle->mark($content, '<mark>', '</mark>');
     
 ### 获取文字中的敏感词
 
@@ -86,3 +94,5 @@ $ phpunit tests/BaseTest.php
 
 
 *如果大家有更好的建议，请大家多多指正，O(∩_∩)O谢谢*
+
+*你们的star是我的动力*

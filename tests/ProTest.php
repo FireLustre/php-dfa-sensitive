@@ -23,6 +23,7 @@ class BaseTest extends TestCase
 
     public function testGetBadWord()
     {
+        $sTime = microtime(true);
         $content = '这是一段测试语句，请忽略赌球网, 第二个敏感词是三级片';
 
         // 过滤,其中【赌球网】在词库中
@@ -34,6 +35,10 @@ class BaseTest extends TestCase
         $badWords = SensitiveHelper::init()
             ->setTreeByFile($this->wordPoolPath)
             ->getBadWord($content, 1, 2);
+
+        $eTime = microtime(true);
+
+        echo ($eTime - $sTime) * 1000 . 'ms' . PHP_EOL;
 
         $this->assertEquals('赌球网', $filterContent[0]);
         $this->assertEquals('三级片', $badWords[1]);
@@ -49,5 +54,25 @@ class BaseTest extends TestCase
             ->replace($content,'*');
 
         $this->assertEquals('这是一段测试语句，请忽略*', $filterContent);
+
+
+        // 过滤,其中【赌球网】在词库中
+        $filterContent = SensitiveHelper::init()
+            ->setTreeByFile($this->wordPoolPath)
+            ->replace($content,'*', true);
+
+        $this->assertEquals('这是一段测试语句，请忽略***', $filterContent);
+    }
+
+    public function testMarkWord()
+    {
+        $content = '这是一段测试语句，请忽略赌球网';
+
+        // 过滤,其中【赌球网】在词库中
+        $markedContent = SensitiveHelper::init()
+            ->setTreeByFile($this->wordPoolPath)
+            ->mark($content,'<mark>', '</mark>');
+
+        $this->assertEquals('这是一段测试语句，请忽略<mark>赌球网</mark>', $markedContent);
     }
 }

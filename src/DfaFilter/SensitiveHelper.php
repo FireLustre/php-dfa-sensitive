@@ -172,17 +172,16 @@ class SensitiveHelper
     /**
      * 替换敏感字字符
      *
-     * @param        $content
-     * @param string $replaceChar
-     * @param string $sTag
-     * @param string $eTag
+     * @param        $content      文本内容
+     * @param string $replaceChar  替换字符
+     * @param bool   $repeat       true=>重复替换为敏感词相同长度的字符
      * @param int    $matchType
      *
      * @return mixed
      * @throws \DfaFilter\Exceptions\PdsBusinessException
      * @throws \DfaFilter\Exceptions\PdsSystemException
      */
-    public function replace($content, $replaceChar = '', $sTag = '', $eTag = '', $matchType = 1)
+    public function replace($content, $replaceChar = '', $repeat = false, $matchType = 1)
     {
         if (empty($content)) {
             throw new PdsBusinessException('请填写检测的内容', PdsBusinessException::EMPTY_CONTENT);
@@ -196,9 +195,41 @@ class SensitiveHelper
         }
 
         foreach ($badWordList as $badWord) {
-            if ($sTag || $eTag) {
-                $replaceChar = $sTag . $badWord . $eTag;
+            if ($repeat) {
+                $replaceChar = $this->dfaBadWordConversChars($badWord, $replaceChar);
             }
+            $content = str_replace($badWord, $replaceChar, $content);
+        }
+        return $content;
+    }
+
+    /**
+     * 标记敏感词
+     *
+     * @param        $content    文本内容
+     * @param string $sTag       标签开头，如<mark>
+     * @param string $eTag       标签结束，如</mark>
+     * @param int    $matchType
+     *
+     * @return mixed
+     * @throws \DfaFilter\Exceptions\PdsBusinessException
+     * @throws \DfaFilter\Exceptions\PdsSystemException
+     */
+    public function mark($content, $sTag, $eTag, $matchType = 1)
+    {
+        if (empty($content)) {
+            throw new PdsBusinessException('请填写检测的内容', PdsBusinessException::EMPTY_CONTENT);
+        }
+
+        $badWordList = self::$badWordList ? self::$badWordList : $this->getBadWord($content, $matchType);
+
+        // 未检测到敏感词，直接返回
+        if (empty($badWordList)) {
+            return $content;
+        }
+
+        foreach ($badWordList as $badWord) {
+            $replaceChar = $sTag . $badWord . $eTag;
             $content = str_replace($badWord, $replaceChar, $content);
         }
         return $content;
@@ -297,5 +328,24 @@ class SensitiveHelper
         }
 
         return;
+    }
+
+    /**
+     * 敏感词替换为对应长度的字符
+     * @param $word
+     * @param $char
+     *
+     * @return string
+     * @throws \DfaFilter\Exceptions\PdsSystemException
+     */
+    protected function dfaBadWordConversChars($word, $char)
+    {
+        $str = '';
+        $length = mb_strlen($word, 'utf-8');
+        for ($counter = 0; $counter < $length; ++$counter) {
+            $str .= $char;
+        }
+
+        return $str;
     }
 }
