@@ -195,10 +195,11 @@ class SensitiveHelper
         }
 
         foreach ($badWordList as $badWord) {
+            $hasReplacedChar = $replaceChar;
             if ($repeat) {
-                $replaceChar = $this->dfaBadWordConversChars($badWord, $replaceChar);
+                $hasReplacedChar = $this->dfaBadWordConversChars($badWord, $replaceChar);
             }
-            $content = str_replace($badWord, $replaceChar, $content);
+            $content = str_replace($badWord, $hasReplacedChar, $content);
         }
         return $content;
     }
