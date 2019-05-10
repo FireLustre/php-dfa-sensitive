@@ -68,7 +68,7 @@ class SensitiveHelper
         }
 
         // 词库树初始化
-        $this->wordTree = new HashMap();
+        $this->wordTree = $this->wordTree ?: new HashMap();
 
         foreach ($this->yieldToReadFile($filepath) as $word) {
             $this->buildWordToTree(trim($word));
