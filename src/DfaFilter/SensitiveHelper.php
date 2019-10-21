@@ -92,7 +92,8 @@ class SensitiveHelper
             throw new PdsBusinessException('词库不能为空', PdsBusinessException::EMPTY_WORD_POOL);
         }
 
-        $this->wordTree = new HashMap();
+        // 同 setTreeByFile 支持多词库
+        $this->wordTree = $this->wordTree ?: new HashMap();
 
         foreach ($sensitiveWords as $word) {
             $this->buildWordToTree($word);
