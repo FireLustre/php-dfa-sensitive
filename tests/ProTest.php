@@ -9,7 +9,7 @@
 use DfaFilter\SensitiveHelper;
 use PHPUnit\Framework\TestCase;
 
-class BaseTest extends TestCase
+class ProTest extends TestCase
 {
     protected $wordPoolPath;
 
@@ -51,7 +51,7 @@ class BaseTest extends TestCase
         // 过滤,其中【赌球网】在词库中
         $filterContent = SensitiveHelper::init()
             ->setTreeByFile($this->wordPoolPath)
-            ->replace($content,'*');
+            ->replace($content, '*');
 
         $this->assertEquals('这是一段测试语句，请忽略*', $filterContent);
 
@@ -59,7 +59,7 @@ class BaseTest extends TestCase
         // 过滤,其中【赌球网】在词库中
         $filterContent = SensitiveHelper::init()
             ->setTreeByFile($this->wordPoolPath)
-            ->replace($content,'*', true);
+            ->replace($content, '*', true);
 
         $this->assertEquals('这是一段测试语句，请忽略***', $filterContent);
     }
@@ -71,7 +71,7 @@ class BaseTest extends TestCase
         // 过滤,其中【赌球网】在词库中
         $markedContent = SensitiveHelper::init()
             ->setTreeByFile($this->wordPoolPath)
-            ->mark($content,'<mark>', '</mark>');
+            ->mark($content, '<mark>', '</mark>');
 
         $this->assertEquals('这是一段测试语句，请忽略<mark>赌球网</mark>', $markedContent);
     }

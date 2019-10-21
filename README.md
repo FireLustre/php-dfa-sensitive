@@ -86,6 +86,8 @@ $ composer update
 ### 运行单元测试
 ```bash
 $ phpunit tests/BaseTest.php
+# OR 
+php vendor/bin/phpunit
 ```
 
 目前已知使用平台：[广电云](http://www.guangdianyun.tv/) 节目直播页面在线聊天功能支持
