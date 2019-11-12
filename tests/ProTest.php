@@ -75,4 +75,23 @@ class ProTest extends TestCase
 
         $this->assertEquals('这是一段测试语句，请忽略<mark>赌球网</mark>', $markedContent);
     }
+
+    public function testEnglish()
+    {
+        $content = '迅雷Av下载';
+        // 词库包含 【aV下载】
+        $bool = (new SensitiveHelper())
+            ->setIgnoreCase(true)
+            ->setTreeByFile($this->wordPoolPath)
+            ->islegal($content);
+
+        $this->assertEquals(true, $bool);
+
+        $bool2 = (new SensitiveHelper())
+            ->setIgnoreCase(false)
+            ->setTreeByFile($this->wordPoolPath)
+            ->islegal($content);
+
+        $this->assertEquals(false, $bool2);
+    }
 }

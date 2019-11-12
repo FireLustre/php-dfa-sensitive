@@ -5,6 +5,7 @@
  * Date: 17/3/9
  * Time: 上午9:11
  */
+
 namespace DfaFilter;
 
 use DfaFilter\Exceptions\PdsBusinessException;
@@ -40,13 +41,19 @@ class SensitiveHelper
     protected static $badWordList = null;
 
     /**
+     * 默认大小写敏感
+     * @var bool
+     */
+    protected $ignoreCase = false;
+
+    /**
      * 获取单例
      *
      * @return self
      */
     public static function init()
     {
-        if (! self::$_instance instanceof self) {
+        if (!self::$_instance instanceof self) {
             self::$_instance = new self();
         }
         return self::$_instance;
@@ -71,7 +78,7 @@ class SensitiveHelper
         $this->wordTree = $this->wordTree ?: new HashMap();
 
         foreach ($this->yieldToReadFile($filepath) as $word) {
-            $this->buildWordToTree(trim($word));
+            $this->buildWordToTree($word);
         }
 
         return $this;
@@ -104,16 +111,16 @@ class SensitiveHelper
     /**
      * 检测文字中的敏感词
      *
-     * @param string   $content    待检测内容
-     * @param int      $matchType  匹配类型 [默认为最小匹配规则]
-     * @param int      $wordNum    需要获取的敏感词数量 [默认获取全部]
+     * @param string $content   待检测内容
+     * @param int    $matchType 匹配类型 [默认为最小匹配规则]
+     * @param int    $wordNum   需要获取的敏感词数量 [默认获取全部]
      * @return array
      * @throws \DfaFilter\Exceptions\PdsSystemException
      */
     public function getBadWord($content, $matchType = 1, $wordNum = 0)
     {
         $this->contentLength = mb_strlen($content, 'utf-8');
-        $badWordList = array();
+        $badWordList = [];
         for ($length = 0; $length < $this->contentLength; $length++) {
             $matchFlag = 0;
             $flag = false;
@@ -121,6 +128,7 @@ class SensitiveHelper
             for ($i = $length; $i < $this->contentLength; $i++) {
                 $keyChar = mb_substr($content, $i, 1, 'utf-8');
 
+                $keyChar = $this->filter($keyChar);
                 // 获取指定节点树
                 $nowMap = $tempMap->get($keyChar);
 
@@ -143,12 +151,12 @@ class SensitiveHelper
                 $flag = true;
 
                 // 最小规则，直接退出
-                if (1 === $matchType)  {
+                if (1 === $matchType) {
                     break;
                 }
             }
 
-            if (! $flag) {
+            if (!$flag) {
                 $matchFlag = 0;
             }
 
@@ -173,9 +181,9 @@ class SensitiveHelper
     /**
      * 替换敏感字字符
      *
-     * @param        $content      文本内容
-     * @param string $replaceChar  替换字符
-     * @param bool   $repeat       true=>重复替换为敏感词相同长度的字符
+     * @param mixed  $content     文本内容
+     * @param string $replaceChar 替换字符
+     * @param bool   $repeat      true=>重复替换为敏感词相同长度的字符
      * @param int    $matchType
      *
      * @return mixed
@@ -208,9 +216,9 @@ class SensitiveHelper
     /**
      * 标记敏感词
      *
-     * @param        $content    文本内容
-     * @param string $sTag       标签开头，如<mark>
-     * @param string $eTag       标签结束，如</mark>
+     * @param mixed  $content 文本内容
+     * @param string $sTag    标签开头，如<mark>
+     * @param string $eTag    标签结束，如</mark>
      * @param int    $matchType
      *
      * @return mixed
@@ -256,6 +264,7 @@ class SensitiveHelper
             for ($i = $length; $i < $this->contentLength; $i++) {
                 $keyChar = mb_substr($content, $i, 1, 'utf-8');
 
+                $keyChar = $this->filter($keyChar);
                 // 获取指定节点树
                 $nowMap = $tempMap->get($keyChar);
 
@@ -290,7 +299,7 @@ class SensitiveHelper
     protected function yieldToReadFile($filepath)
     {
         $fp = fopen($filepath, 'r');
-        while (! feof($fp)) {
+        while (!feof($fp)) {
             yield fgets($fp);
         }
         fclose($fp);
@@ -302,6 +311,7 @@ class SensitiveHelper
         if ('' === $word) {
             return;
         }
+        $word = $this->filter($word);
         $tree = $this->wordTree;
 
         $wordLength = mb_strlen($word, 'utf-8');
@@ -349,5 +359,27 @@ class SensitiveHelper
         }
 
         return $str;
+    }
+
+    /**
+     * 设置是否忽略 大小写
+     * @param bool $bool
+     * @return SensitiveHelper
+     */
+    public function setIgnoreCase($bool = true)
+    {
+        $this->ignoreCase = $bool;
+        return $this;
+    }
+
+    /**
+     * 文本过滤
+     * @param string $word
+     * @return string
+     */
+    protected function filter($word)
+    {
+        $word = trim($word);
+        return true === $this->ignoreCase ? strtolower($word) : $word;
     }
 }
