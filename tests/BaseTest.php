@@ -39,6 +39,18 @@ class BaseTest extends TestCase
         $this->assertEquals('三级片', $badWords[1]);
     }
 
+    public function testGetBadWordUnqiue()
+    {
+        $content = '这是一段测试语句，请忽略赌球网, 第二个敏感词是三级片,第二次出现赌球网';
+
+        // 返回规定数量的敏感词,其中【赌球网,三级片】在词库中
+        $badWords = SensitiveHelper::init()
+            ->setTree($this->wordData)
+            ->getBadWord($content);
+
+        $this->assertEquals(['赌球网', '三级片'], $badWords);
+    }
+
     public function testFilterWord()
     {
         $content = '这是一段测试语句，请忽略赌球网';

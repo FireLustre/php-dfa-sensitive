@@ -166,7 +166,7 @@ class SensitiveHelper
             // 需匹配内容标志位往后移
             $length = $length + $matchFlag - 1;
         }
-        return $badWordList;
+        return array_unique($badWordList);
     }
 
     /**
