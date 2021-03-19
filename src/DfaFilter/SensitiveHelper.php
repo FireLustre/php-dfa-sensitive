@@ -228,6 +228,7 @@ class SensitiveHelper
         if (empty($badWordList)) {
             return $content;
         }
+        $badWordList = array_unique($badWordList);
 
         foreach ($badWordList as $badWord) {
             $replaceChar = $sTag . $badWord . $eTag;
