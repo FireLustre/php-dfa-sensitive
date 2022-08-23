@@ -95,7 +95,7 @@ class SensitiveHelper
         $this->wordTree = new HashMap();
 
         foreach ($sensitiveWords as $word) {
-            $this->buildWordToTree($word);
+            $this->buildWordToTree(trim($word));
         }
         return $this;
     }
